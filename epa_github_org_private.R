@@ -29,7 +29,7 @@ usepa_commits_df <- do.call("rbind", usepa_commitsldfs) %>%
   mutate(repo_name = stringr::str_extract(url, "USEPA/.+/commits")) %>%
   mutate(repo_name = stringr::str_replace(repo_name, "USEPA/","")) %>%
   mutate(repo_name = stringr::str_replace(repo_name, "/commits","")) %>%
-  mutate(commit_date = stringr::str_split(lubridate::ymd_hms(commit_date), " ")[[1]][1])
+  mutate(commit_date = date(commit_date))
   
 usepa_commits_per_private_repo <- usepa_commits_df %>% 
   group_by(repo_name) %>%
@@ -37,5 +37,11 @@ usepa_commits_per_private_repo <- usepa_commits_df %>%
   arrange(num_commits) 
 
 usepa_latest_commit_per_private_repo <- usepa_commits_df %>% 
-  group_by(repo_name, commit_date) %>%
+  group_by(repo_name) %>%
   summarise(last_commit = max(commit_date))
+
+usepa_private_repo_stats <- usepa_commits_per_private_repo %>%
+  full_join(usepa_latest_commit_per_private_repo) %>%
+  arrange(last_commit, num_commits)
+
+readr::write_csv(usepa_private_repo_stats,"priv_repo_stats.csv")
