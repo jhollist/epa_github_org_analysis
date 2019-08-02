@@ -29,7 +29,7 @@ usepa_commits_df <- do.call("rbind", usepa_commitsldfs) %>%
   mutate(repo_name = stringr::str_extract(url, "USEPA/.+/commits")) %>%
   mutate(repo_name = stringr::str_replace(repo_name, "USEPA/","")) %>%
   mutate(repo_name = stringr::str_replace(repo_name, "/commits","")) %>%
-  mutate(commit_date = date(commit_date))
+  mutate(commit_date = lubridate::date(commit_date))
   
 usepa_commits_per_private_repo <- usepa_commits_df %>% 
   group_by(repo_name) %>%
